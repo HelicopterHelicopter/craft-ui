@@ -85,6 +85,13 @@ export {
   type CraftPaperClipTone,
 } from './components/CraftPaperClip'
 export {
+  CraftClippedCard,
+  CraftClippedStack,
+  type CraftClippedCardProps,
+  type CraftClippedStackProps,
+  type ClipPosition,
+} from './components/CraftClippedCard'
+export {
   CraftTable,
   CraftTableCaption,
   CraftTableHeader,

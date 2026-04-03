@@ -1,6 +1,6 @@
 {
   "name": "@kuboxx/craft-ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Craft-themed React UI primitives — paper, rope, crayon palette",
   "homepage": "https://craft-ui.jheels.in/",
   "repository": {

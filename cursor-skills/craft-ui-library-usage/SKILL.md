@@ -177,6 +177,7 @@ If you need to pick components, use the catalog below. Prefer composing by “ph
 
 - `CraftList` / `CraftListItem` — list with selectable markers; optional ordered mode
 - `CraftPaperClip` — 3D paper clip SVG icon
+- `CraftClippedCard` / `CraftClippedStack` — clipped-corner card surfaces; `ClipPosition` for clip placement
 - `CraftAvatar` — avatar with `src` or initials fallback (size/shape/crayon wash)
 - `CraftTable` and table parts:
   - `CraftTableCaption`

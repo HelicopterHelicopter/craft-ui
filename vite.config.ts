@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import dts from 'vite-plugin-dts'
 
 export default defineConfig(() => {
@@ -15,7 +15,7 @@ export default defineConfig(() => {
         ? [
             dts({
               include: ['src/**/*.{ts,tsx}'],
-              exclude: ['src/**/*.stories.tsx'],
+              exclude: ['src/**/*.stories.tsx', 'src/**/*.test.{ts,tsx}'],
               rollupTypes: true,
             }),
           ]
@@ -33,6 +33,23 @@ export default defineConfig(() => {
         output: {
           assetFileNames: 'craft-ui.[ext]',
         },
+      },
+    },
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setup.ts'],
+      include: ['src/**/*.test.{ts,tsx}'],
+      coverage: {
+        provider: 'v8',
+        include: ['src/**/*.{ts,tsx}'],
+        exclude: [
+          '**/node_modules/**',
+          '**/.storybook/**',
+          'src/**/*.stories.{ts,tsx}',
+          'src/**/*.test.{ts,tsx}',
+          'src/test/**',
+          'src/vite-env.d.ts',
+        ],
       },
     },
   }

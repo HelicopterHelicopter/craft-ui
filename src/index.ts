@@ -91,6 +91,17 @@ export {
   type CraftClippedStackProps,
   type ClipPosition,
 } from './components/CraftClippedCard'
+/* Phase 7 — craft primitives + common UI */
+export { CraftPushpin, type CraftPushpinProps, type CraftPushpinTone } from './components/CraftPushpin'
+export { CraftStamp, type CraftStampProps, type CraftStampTone, type CraftStampSize, type CraftStampShape } from './components/CraftStamp'
+export { CraftScribble, type CraftScribbleProps, type CraftScribbleType } from './components/CraftScribble'
+export { CraftCarousel, type CraftCarouselProps, type CraftCarouselItem } from './components/CraftCarousel'
+export {
+  CraftAccordion,
+  type CraftAccordionProps,
+  type CraftAccordionItem,
+} from './components/CraftAccordion'
+
 export {
   CraftTable,
   CraftTableCaption,

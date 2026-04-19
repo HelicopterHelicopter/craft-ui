@@ -1,6 +1,6 @@
 ---
 name: craft-ui-library-usage
-description: Teaches correct usage of the npm package `@kuboxx/craft-ui` — install, CSS export, CraftProvider, full component catalog, and composition patterns for surfaces, forms, navigation, overlays, and data display. Use whenever the user mentions `@kuboxx/craft-ui`, kuboxx craft-ui, scoped imports from that package, or asks to build UI with this library; also use when choosing components or auditing craft-ui usage in app code. Same SKILL.md works in Cursor and Claude Code (Agent Skills) and other tools that support the open Agent Skills format.
+description: Teaches correct usage of the npm package `@kuboxx/craft-ui` — install, CSS export, CraftProvider, full component catalog, and composition patterns for surfaces, forms, navigation, overlays, data display, and craft primitives (pushpin, stamp, scribble, carousel, accordion). Use whenever the user mentions `@kuboxx/craft-ui`, kuboxx craft-ui, scoped imports from that package, or asks to build UI with this library; also use when choosing components or auditing craft-ui usage in app code. Same SKILL.md works in Cursor and Claude Code (Agent Skills) and other tools that support the open Agent Skills format.
 ---
 
 # `@kuboxx/craft-ui` — agent usage guide
@@ -185,6 +185,14 @@ If you need to pick components, use the catalog below. Prefer composing by “ph
   - `CraftTableRow`
   - `CraftTableHeadCell` / `CraftTableCell`
 
+### Phase 7 — craft primitives + common UI
+
+- `CraftPushpin` — SVG thumbtack with sphere-lit dome head and metal pin. Props: `tone` (`CraftCrayon | 'silver' | 'gold'`), `size` (px, default 28). Aria-hidden; place inside a positioned container to pin onto a surface (card corner, sticky note top, corkboard, etc.).
+- `CraftStamp` — rubber-stamp impression overlay. Uses an inline SVG `feTurbulence + feDisplacementMap` filter for ink roughness, `mix-blend-mode: multiply` so it reads as pressed into paper. Props: `label` (string), `tone` (`'red' | 'blue' | 'green' | 'violet' | 'gold'`), `rotate` (degrees, default 12), `size` (`'sm' | 'md' | 'lg'`), `shape` (`'rect' | 'oval'`). Position `absolute` on a card for status labelling (APPROVED, DRAFT, PAID, etc.).
+- `CraftScribble` — 12 hand-drawn SVG marks that inherit `currentColor`. Props: `type` (required, one of `'arrow-right' | 'arrow-left' | 'arrow-up' | 'arrow-down' | 'check' | 'cross' | 'circle' | 'underline' | 'star' | 'heart' | 'bracket-left' | 'bracket-right'`), `size` (px, default 24), `strokeWidth` (default 2). Add `fill=”currentColor”` on `star` / `heart` for filled variants.
+- `CraftCarousel` — Polaroid-strip carousel. Slides render inside white photo-frame Polaroids with washi-tape corners on the active slide; neighbors peek ~24 % in from each edge; pushpin-dot pagination; `CraftScribble` arrow nav. Props: `items` (`CraftCarouselItem[]` — `{ id, content, caption?, rotate? }`), `defaultIndex`, `value` / `onValueChange` (controlled), `showArrows` (default true), `showDots` (default true). Keyboard: ←/→/Home/End.
+- `CraftAccordion` — accordion using CSS `grid-template-rows: 0fr → 1fr` for smooth height animation (no JS measurement). Open header shows a `WashiStrip` accent and a rotating `CraftScribble arrow-down` chevron. Props: `items` (`CraftAccordionItem[]` — `{ value, label, content, disabled?, tint? }`), `multiple` (allow multiple open, default false), `defaultValue`, `value` / `onValueChange` (controlled).
+
 ## Common composition rules (how to use components “properly”)
 
 ### Root styling
@@ -236,6 +244,30 @@ If you need to pick components, use the catalog below. Prefer composing by “ph
 - `CraftList`:
   - use `CraftListItem` and let the component handle marker rendering; keep custom leading art as `marker="none"` when supported by your use case.
 
+### Craft primitives + common UI (Phase 7)
+
+- `CraftPushpin`:
+  - place inside a `position: relative` parent, use `absolute` positioning to pin it to a corner
+  - typical: `<div className="relative"> <CraftCard>…</CraftCard> <CraftPushpin className="absolute -top-4 left-4" tone="red" /> </div>`
+  - aria-hidden — purely decorative; do not use as an interactive element
+- `CraftStamp`:
+  - typically `position: absolute` inside a `relative` card wrapper at a slight angle (e.g. `rotate={-12}`)
+  - `mix-blend-mode: multiply` is applied by default so it blends with paper; works best on light/paper backgrounds
+  - the inline SVG filter is appended to the DOM — keep the component in the React tree (not portalled to `<body>`) so the filter ID resolves correctly
+- `CraftScribble`:
+  - use `className="text-craft-orange"` (or any Tailwind text-color) to set stroke color via `currentColor`
+  - for filled shapes (`star`, `heart`) add `fill="currentColor"` and optionally lower `strokeWidth`
+  - pairs naturally as nav-arrow inside `CraftCarousel` and as chevron inside `CraftAccordion` — but you can use any of the 12 marks inline in text, buttons, or decorative art
+- `CraftCarousel`:
+  - `items` is required — pass an array of `{ id, content, caption?, rotate? }`
+  - `content` is the photo area inside the Polaroid; typically a fixed-height block (`<div className="h-48">…</div>`) or `<img>` so all slides are the same height
+  - for controlled state use `value` (current index, number) + `onValueChange`
+  - keyboard focus lives on the container `div` — do not remove `tabIndex`
+- `CraftAccordion`:
+  - `items[].tint` sets the WashiStrip color shown on an open header (`'yellow' | 'mint' | 'pink' | 'lavender'`)
+  - `multiple={true}` allows any number of panels open simultaneously; default is single-open (opening one closes others)
+  - for controlled usage, `value` is a `string` (single mode) or `string[]` (multiple mode); `onValueChange` receives the same type
+
 ## Output quality checks (agent self-audit)
 
 Before finalizing generated code that uses **`@kuboxx/craft-ui`**, verify:
@@ -244,9 +276,13 @@ Before finalizing generated code that uses **`@kuboxx/craft-ui`**, verify:
 - Correct CSS import is present **once** at a root that wraps all craft UI.
 - The UI is wrapped in `CraftProvider` (and `vibe` is set when the design is scrapbook/collage).
 - Component composition matches the catalog (e.g., `CraftRadioGroup` wraps `CraftRadio`; `CraftTable` uses `CraftTableHeader/Body/Row/Cell` parts).
+- `CraftStamp` is not portalled — it must stay in the React tree so its inline SVG filter resolves.
+- `CraftCarousel` items always have a fixed-height `content` block so all slides share the same height (avoids layout shifts).
+- `CraftScribble` color is set via a text-color class (`text-craft-orange`, etc.) not a `color` prop.
 - For accessibility-sensitive components:
   - tooltips use focus/hoverable children
-  - radios share the same `name` across `CraftRadio` children in a `CraftRadioGroup`.
+  - radios share the same `name` across `CraftRadio` children in a `CraftRadioGroup`
+  - `CraftCarousel` and `CraftAccordion` manage their own keyboard interaction — do not nest interactive elements that capture arrow keys.
 
 ## Working in this repo (`craft-ui` source)
 
